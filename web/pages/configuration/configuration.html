@@ -1,0 +1,43 @@
+<script type="text/javascript" src="pages/configuration/configuration.js"></script>
+
+<div class="col_6">
+	<h4>Configuration</h4>
+	<blockquote>
+	<p>
+	A basic check that the configuration is consistent with the server specification.
+	</p>
+	
+	<ul>
+		<li>SSI is verified by checking if HTML elements, included via SSI, are present on the page.</li>
+		<li>Availability of resources (base.html, prezo.js, and csrf.js) is verified by using an AJAX GET to successfully retrieve each resource.</li>
+	</ul>
+	</blockquote>
+</div>
+
+<div class="col_6">
+	<h4>Tests</h4>
+	<blockquote>
+	<!-- Warning -->
+	<div id="ssi_check" class="notice warning">
+		<i id="ssi_check_icon" class="icon-check-empty"></i>
+		<div id="ssi_check_message"></div>
+	</div>
+	
+	<div id="base_html_check" class="notice warning">
+		<i id="base_html_icon" class="icon-check-empty"></i>
+		<div id="base_html_message"></div>
+	</div>
+	
+	<div id="constants_js_check" class="notice warning">
+		<i id="constants_js_icon" class="icon-check-empty"></i>
+		<div id="constants_js_message"></div>
+	</div>
+	
+	<div id="csrf_js_check" class="notice warning">
+		<i id="csrf_js_icon" class="icon-check-empty"></i>
+		<div id="csrf_js_message"></div>
+	</div>
+	
+	<button id="run_button" class="medium green pill"><i class="icon-play-circle"></i> Run tests</button>
+	</blockquote>
+</div>

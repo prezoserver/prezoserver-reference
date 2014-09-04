@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+<!--#include virtual="/prezo/fragments/base.html" -->
+<script type="text/javascript" src="inc/lib/jquery/js/jquery-1.11.1.min.js"></script>
+<script type="text/javascript" src="inc/js/jquery.url.js"></script>
+<script>
+$( document ).ready(function() {
+	var endpoint = decodeURIComponent($.url.param(window.location.href, "endpoint"));
+	var timestamp = new Date().getTime();
+	$.ajax({
+		url: endpoint + "?t=" + timestamp,
+		dataType: "json",
+		statusCode: {
+			417: function(json) {
+				$("body").append("AJAX status code 417 detected!");					
+			}
+		}
+	});
+});
+</script>
+</head>
+
+<body>
+
+</body>
+</html>
