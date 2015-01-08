@@ -99,7 +99,7 @@ org.prezoserver.page.Security = function() {
 			dataType: "json",
 			statusCode: {
 				200: function(json) {
-					if (json.test === "PrezoServer") {
+					if (json.message === "PrezoServer") {
 						$("#ajax_with_csrf_check_icon").removeClass("icon-check-empty");
 						$("#ajax_with_csrf_check").removeClass("warning");			
 						$("#ajax_with_csrf_check_icon").addClass("icon-check");
