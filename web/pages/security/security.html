@@ -8,8 +8,8 @@
 	</p>
 	
 	<ul>
-		<li>AJAX with csrf.js includes the csrf.js script and then accesses a CSRF protected URL provided by the user. The user is responsible for defining a resource that is CSRF protected and returns the following JSON object: {"test" : "PrezoServer"}</li>
-		<li>AJAX without csrf.js does not include the csrf.js script and then accesses a CSRF protected URL provided by the user as described above. It tests that an attempt to access the resource causes the server to respond with the expected error status code and message.</li>
+		<li>AJAX with csrf.js includes the csrf.js script and then accesses a CSRF protected URL provided by the user. The user is responsible for defining a resource that is CSRF protected and returns the following JSON object: {"message" : "PrezoServer"}</li>
+		<li>AJAX without csrf.js does not include the csrf.js script. It attempts to accesses a CSRF protected URL provided by the user as described above. It tests that an attempt to access the resource causes the server to respond with the expected error status code and message.</li>
 	</ul>
 	</blockquote>
 </div>
