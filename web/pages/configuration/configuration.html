@@ -1,4 +1,4 @@
-<script type="text/javascript" src="pages/configuration/configuration.js"></script>
+<script type="text/javascript" src="pages/configuration2/configuration.js"></script>
 
 <div class="col_6">
 	<h4>Configuration</h4>
@@ -14,30 +14,30 @@
 	</blockquote>
 </div>
 
-<div class="col_6">
+<div class="col_6" ng-controller="ConfigurationController as config">
 	<h4>Tests</h4>
 	<blockquote>
-	<!-- Warning -->
-	<div id="ssi_check" class="notice warning">
-		<i id="ssi_check_icon" class="icon-check-empty"></i>
-		<div id="ssi_check_message"></div>
-	</div>
-	
-	<div id="base_html_check" class="notice warning">
-		<i id="base_html_icon" class="icon-check-empty"></i>
-		<div id="base_html_message"></div>
-	</div>
-	
-	<div id="constants_js_check" class="notice warning">
-		<i id="constants_js_icon" class="icon-check-empty"></i>
-		<div id="constants_js_message"></div>
-	</div>
-	
-	<div id="csrf_js_check" class="notice warning">
-		<i id="csrf_js_icon" class="icon-check-empty"></i>
-		<div id="csrf_js_message"></div>
-	</div>
-	
-	<button id="run_button" class="medium green pill"><i class="icon-play-circle"></i> Run tests</button>
+		<div class="notice" ng-class="{'warning':config.ssi.checked === false, 'success':config.ssi.checked && config.ssi.passed, 'error':config.ssi.checked && config.ssi.passed === false}">
+			<i ng-class="{'icon-check':config.ssi.checked === true, 'icon-check-empty':config.ssi.checked === false}"></i>
+			<div>Server Side Includes (SSI) {{config.ssi.message}}</div>
+		</div>
+		
+		<div class="notice" ng-class="{'warning':config.baseHtml.checked === false, 'success':config.baseHtml.checked && config.baseHtml.passed, 'error':config.baseHtml.checked && config.baseHtml.passed === false}">
+			<i ng-class="{'icon-check':config.baseHtml.checked === true, 'icon-check-empty':config.baseHtml.checked === false}"></i>
+			<div>/prezo/fragments/base.html {{config.baseHtml.message}}</div>
+		</div>
+		
+		<div class="notice" ng-class="{'warning':config.prezoJS.checked === false, 'success':config.prezoJS.checked && config.prezoJS.passed, 'error':config.prezoJS.checked && config.prezoJS.passed === false}">
+			<i ng-class="{'icon-check':config.prezoJS.checked === true, 'icon-check-empty':config.prezoJS.checked === false}"></i>
+			<div>/prezo/js/prezo.js {{config.prezoJS.message}}</div>
+		</div>
+		
+		<div class="notice" ng-class="{'warning':config.csrfJS.checked === false, 'success':config.csrfJS.checked && config.csrfJS.passed, 'error':config.csrfJS.checked && config.csrfJS.passed === false}">
+			<i ng-class="{'icon-check':config.csrfJS.checked === true, 'icon-check-empty':config.csrfJS.checked === false}"></i>
+			<div>/prezo/js/csrf.js {{config.csrfJS.message}}</div>
+		</div>
+		
+		<button class="medium green pill" ng-click="config.runTests()"><i class="icon-play-circle"></i> Run tests</button>
+		<button class="medium green pill" ng-click="config.reset()"><i class="icon-play-circle"></i> Reset</button>
 	</blockquote>
 </div>
