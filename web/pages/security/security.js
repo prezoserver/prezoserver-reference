@@ -1,164 +1,88 @@
-Namespace("org.prezoserver.page");
+Namespace("org.prezoserver");
 
-$( document ).ready(function() {
-	var page = new org.prezoserver.page.Security();
-	page.init();
-});
-
-org.prezoserver.page.Security = function() {
-	var self = this;
+org.prezoserver.SecurityController = function($scope) {
+	this.TEST_IFRAME_ID = "test_iframe";
+	this.ajaxWithCsrf = {checked:false, passed:false, message:null};
+	this.ajaxNoCsrf = {checked:false, passed:false, message:null};
+	this.endpoint = null;
 	
-	// tracks whether or not all tests passed
-	var passed = true;
-	
-	var endpoint;
-	
-	/**
-	 * Initializes the page and bind the click event to the 'Run tests' button
-	 */
-	this.init = function() {
-		self.resetTestResults();
-		
-		$("#run_button").bind("click", function() {
-			self.resetTestResults();
-			
-			if ($("#endpoint_select").val() === 'Other') {
-				endpoint = $("#endpoint").val();
-				
-				if (endpoint === null || endpoint.trim() === '') {
-					$("#endpoint_label").addClass("error");
-					$("#endpoint").addClass("error");
-				}
-			} else {
-				endpoint = $("#endpoint_select").val();
-				
-				if (endpoint === null || endpoint.trim() === '') {
-					$("#endpoint_label").addClass("error");
-					$("#endpoint_select").addClass("error");
-				}
-			}
-			
-			if (endpoint !== null && endpoint.trim() !== '') {
-				// contrive some time delays for effect and to allow each test to finish
-				setTimeout(self.checkAjaxWithCsrf, 500);
-				setTimeout(self.createIframe, 1250);
-				setTimeout(self.checkWithoutCsrf, 2000);
-				setTimeout(self.report, 2750);
-			}
-		});
-		
-		$("#endpoint_select").bind("change", function() {
-			self.resetTestResults();
-			
-			endpoint = $("#endpoint").val();
-			if ($("#endpoint_select").val() === 'Other') {
-				$("#endpoint").show();
-			} else {
-				$("#endpoint").hide();
-			}
-		});
+	this.reset = function() {
+		this.ajaxWithCsrf = {checked:false, passed:false, message:null};
+		this.ajaxNoCsrf = {checked:false, passed:false, message:null};
 	};
 	
-	/** 
-	 * Resets the test results.
-	 */
-	this.resetTestResults = function() {
-		passed = true;
-		
-		// reset error states
-		$("#endpoint_label").removeClass("error");
-		$("#endpoint").removeClass("error");
-		$("#endpoint_select").removeClass("error");
+	this.reset = function() {
+		this.ajaxWithCsrf = {checked:false, passed:false, message:null};
+		this.ajaxNoCsrf = {checked:false, passed:false, message:null};
+		$("#" + this.TEST_IFRAME_ID).remove();
+	};
+	
+	this.runTests = function() {	
+		setTimeout(this.testAjaxWithCsrf, 500);
+		setTimeout(this.createIframe, 750);
+		setTimeout(this.testAjaxNoCsrf, 1000);
+		setTimeout(function() {
+			this.testsExecuted = true;
 			
-		// reset ajax with csrf.js check
-		$("#ajax_with_csrf_check_icon").removeClass("icon-check");
-		$("#ajax_with_csrf_check").removeClass("error");
-		$("#ajax_with_csrf_check").removeClass("success");
-		$("#ajax_with_csrf_check_icon").addClass("icon-check-empty");
-		$("#ajax_with_csrf_check").addClass("warning");			
-		$("#ajax_with_csrf_check_message").text("AJAX with csrf.js");
-		
-		// reset ajax without csrf.js check
-		$("#ajax_with_no_csrf_iframe").remove();
-		$("#ajax_with_no_csrf_check_icon").removeClass("icon-check");
-		$("#ajax_with_no_csrf_check").removeClass("error");
-		$("#ajax_with_no_csrf_check").removeClass("success");
-		$("#ajax_with_no_csrf_check_icon").addClass("icon-check-empty");
-		$("#ajax_with_no_csrf_check").addClass("warning");
-		$("#ajax_with_no_csrf_check_message").text("AJAX without csrf.js");
+			if (this.ajaxWithCsrf.passed && this.ajaxNoCsrf.passed) {
+				alert("Congratulations! The server configuration appears to be PrezoServer compliant.");
+			} else {
+				alert("Sorry! The server configuration does not appear to be PrezoServer compliant. Check configuration and try again.");
+			}
+		}.bind(this), 1250);
 	};
 	
 	/**
 	 * Checks if an AJAX request is successful to a JSON endpoint
 	 * that is protected from CSRF attacks.
 	 */
-	this.checkAjaxWithCsrf = function() {
+	this.testAjaxWithCsrf = function() {
+		this.ajaxWithCsrf.checked = true;
+				
 		var timestamp = new Date().getTime();
 		$.ajax({
-			url: endpoint + "?t=" + timestamp,
+			url: this.endpoint + "?t=" + timestamp,
 			dataType: "json",
 			statusCode: {
 				200: function(json) {
-					if (json.message === "PrezoServer") {
-						$("#ajax_with_csrf_check_icon").removeClass("icon-check-empty");
-						$("#ajax_with_csrf_check").removeClass("warning");			
-						$("#ajax_with_csrf_check_icon").addClass("icon-check");
-						$("#ajax_with_csrf_check").addClass("success");			
-						$("#ajax_with_csrf_check_message").append(" ... passed (JSON object retrieved).");
-					} else {
-						self.ajaxWithCsrfFailed();
-					}
-				}
-			},
-			error: function() {
-				self.ajaxWithCsrfFailed();
+					this.ajaxWithCsrf.passed = true;
+					this.ajaxWithCsrf.message = " ... passed (JSON object retrieved).";
+					$scope.$apply();
+				}.bind(this),
+				error: function() {
+					this.ajaxWithCsrf.message = " ... failed (JSON object not retrieved).";
+					$scope.$apply();
+				}.bind(this)
 			}
-		});		
-	}
+		});	
+	}.bind(this);
 	
-	this.ajaxWithCsrfFailed = function() {
-		$("#ajax_with_csrf_check_icon").removeClass("icon-check-empty");
-		$("#ajax_with_csrf_check").removeClass("warning");						
-		$("#ajax_with_csrf_check_icon").addClass("icon-check");
-		$("#ajax_with_csrf_check").addClass("error");
-		$("#ajax_with_csrf_check_message").append(" ... failed (JSON object not retrieved).");
-		passed = false;
-	}
-	
-	this.createIframe = function() {
-		$("#ajax_with_no_csrf_check").append('<iframe id="ajax_with_no_csrf_iframe" style="display:none" src="pages/security/iframe.html?endpoint='+ encodeURIComponent(endpoint) + '"></iframe>');
-	}
-		
 	/**
-	 * 
+	 * Checks the result in the iframe to determine if CSRF check passed. A 
+	 * CSRF error status code is expected since CSRF was not included. 
 	 */
-	this.checkWithoutCsrf = function() {
-		var body = $("#ajax_with_no_csrf_iframe").contents().find("body").html();
+	this.testAjaxNoCsrf = function() {
+		this.ajaxNoCsrf.checked = true; 
+		
+		var body = $("#" + this.TEST_IFRAME_ID).contents().find("body").html();
 		
 		if (body.indexOf('AJAX status code 417 detected!') >= 0) {
-			$("#ajax_with_no_csrf_check_icon").removeClass("icon-check-empty");
-			$("#ajax_with_no_csrf_check").removeClass("warning");			
-			$("#ajax_with_no_csrf_check_icon").addClass("icon-check");
-			$("#ajax_with_no_csrf_check").addClass("success");			
-			$("#ajax_with_no_csrf_check_message").append(" ... passed (request blocked and server returned status code 417).");
+			this.ajaxNoCsrf.passed = true;
+			this.ajaxNoCsrf.message = " ... passed (request blocked and server returned status code 417).";
 		} else {
-			$("#ajax_with_no_csrf_check_icon").removeClass("icon-check-empty");
-			$("#ajax_with_no_csrf_check").removeClass("warning");						
-			$("#ajax_with_no_csrf_check_icon").addClass("icon-check");
-			$("#ajax_with_no_csrf_check").addClass("error");
-			$("#ajax_with_no_csrf_check_message").append(" ... failed (content was successfully retrieved without being blocked).");
-			passed = false;
+			this.ajaxNoCsrf.message = " ... failed (content was successfully retrieved without being blocked).";
 		}
-	}
 		
-	/**
-	 * Once all tests are complete this provides a report of success or failure.
-	 */
-	this.report = function() {
-		if (passed) {
-			alert("Congratulations! The server security appears to be PrezoServer compliant.");
-		} else {
-			alert("Sorry! The server security does not appear to be PrezoServer compliant. Check configuration and try again.");
-		}
-	}
-}
+		$scope.$apply();
+	}.bind(this);
+	
+	this.createIframe = function() {
+		$("body").append('<iframe id="' + this.TEST_IFRAME_ID + '" style="display:none" src="pages/security/iframe.html?endpoint='+ encodeURIComponent(this.endpoint) + '"></iframe>');
+	}.bind(this);
+};
+
+(function() {
+	var app = angular.module('security', []);
+	
+	app.controller('SecurityController', org.prezoserver.SecurityController);
+})();

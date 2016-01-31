@@ -1,4 +1,4 @@
-<script type="text/javascript" src="pages/security/security.js"></script>
+<script type="text/javascript" src="pages/security2/security.js"></script>
 
 <div class="col_6">
 	<h4>Security</h4>
@@ -14,31 +14,31 @@
 	</blockquote>
 </div>
 
-<div class="col_6">
+<div class="col_6" ng-controller="SecurityController as security">
 	<h4>Tests</h4>
 	<blockquote>
-		<div id="ajax_with_csrf_check" class="notice warning">
-			<i id="ajax_with_csrf_check_icon" class="icon-check-empty"></i>
-			<div id="ajax_with_csrf_check_message"></div>
+		<div class="notice" ng-class="{'warning':security.ajaxWithCsrf.checked === false, 'success':security.ajaxWithCsrf.checked && security.ajaxWithCsrf.passed, 'error':security.ajaxWithCsrf.checked && security.ajaxWithCsrf.passed === false}">
+			<i ng-class="{'icon-check':security.ajaxWithCsrf.checked, 'icon-check-empty':security.ajaxWithCsrf.checked === false}"></i>
+			<div>AJAX with csrf.js {{security.ajaxWithCsrf.message}}</div>
 		</div>
 		
-		<div id="ajax_with_no_csrf_check" class="notice warning">
-			<i id="ajax_with_no_csrf_check_icon" class="icon-check-empty"></i>
-			<div id="ajax_with_no_csrf_check_message"></div>
-		</div>	
-	
+		<div class="notice" ng-class="{'warning':security.ajaxNoCsrf.checked === false, 'success':security.ajaxNoCsrf.checked && security.ajaxNoCsrf.passed, 'error':security.ajaxNoCsrf.checked && security.ajaxNoCsrf.passed === false}">
+			<i ng-class="{'icon-check':security.ajaxNoCsrf.checked, 'icon-check-empty':security.ajaxNoCsrf.checked === false}"></i>
+			<div>AJAX without csrf.js {{security.ajaxNoCsrf.message}}</div>
+		</div>
+			
 		<label id="endpoint_label" for="endpoint">CSRF protected resource (required):</label>
 		<br />
-		<select id="endpoint_select">
+		<select ng-model="security.endpoint">
 			<option value="">-- Choose --</option>
-			<option value="api/csrf-test.json.jsp">api/csrf-test.json.jsp (Java implementation)</option>
-			<option value="api/csrf-test.json.php">api/csrf-test.json.php (PHP implementation)</option>
-			<option value="api/csrf-test.json.asp">api/csrf-test.json.asp (IIS implementation)</option>
+			<option value="api/csrf-test.json.asp">IIS implementation (api/csrf-test.json.asp)</option>
+			<option value="api/csrf-test.json.jsp">Java implementation (api/csrf-test.json.jsp)</option>
+			<option value="api/csrf-test.json.php">PHP implementation (api/csrf-test.json.php)</option>
 			<option value="Other">Other (specify path below)</option>
-		</select>
+		</select>		
 		<br />
-		<input id="endpoint" name="endpoint" class="hide" type="text" size="25" />		
 		<br />
-		<button id="run_button" class="medium green pill"><i class="icon-play-circle"></i> Run tests</button>
+		<button class="medium pill" ng-class="{'gray':security.endpoint === null, 'green':security.endpoint !== null}" ng-disabled="security.endpoint === null" ng-click="security.runTests()"><i class="icon-play-circle"></i> Run tests</button>
+		<button class="medium pill" ng-class="{'gray':security.ajaxNoCsrf.checked === false, 'green':security.ajaxNoCsrf.checked}" ng-disabled="security.ajaxNoCsrf.checked === false" ng-click="security.reset()"><i class="icon-play-circle"></i> Reset</button>
 	</blockquote>
 </div>
