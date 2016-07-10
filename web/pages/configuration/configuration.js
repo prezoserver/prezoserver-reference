@@ -1,16 +1,12 @@
 Namespace("org.prezoserver");
 
 org.prezoserver.ConfigurationController = function($scope) {
-	this.ssi = {checked:false, passed:false, message:null};
-	this.baseHtml = {checked:false, passed:false, message:null};
-	this.prezoJS = {checked:false, passed:false, message:null};
-	this.csrfJS = {checked:false, passed:false, message:null};
-	
-	this.reset = function() {
+	this.init = function() {
 		this.ssi = {checked:false, passed:false, message:null};
 		this.baseHtml = {checked:false, passed:false, message:null};
 		this.prezoJS = {checked:false, passed:false, message:null};
 		this.csrfJS = {checked:false, passed:false, message:null};
+		this.support = {checked:false, passed:false, message:null};
 	};
 	
 	this.runTests = function() {	
@@ -18,15 +14,16 @@ org.prezoserver.ConfigurationController = function($scope) {
 		setTimeout(this.testBaseHtml, 1000);
 		setTimeout(this.testPrezoJS, 1250);
 		setTimeout(this.testCsrfJS, 1500);
+		setTimeout(this.testSupport, 1750);
 		setTimeout(function() {
 			this.testsExecuted = true;
 			
-			if (this.ssi.passed && this.baseHtml.passed && this.prezoJS.passed && this.csrfJS.passed) {
+			if (this.ssi.passed && this.baseHtml.passed && this.prezoJS.passed && this.csrfJS.passed && this.support.passed) {
 				alert("Congratulations! The server configuration appears to be PrezoServer compliant.");
 			} else {
 				alert("Sorry! The server configuration does not appear to be PrezoServer compliant. Check configuration and try again.");
 			}
-		}.bind(this), 1750);
+		}.bind(this), 2000);
 	};
 	
 	/**
@@ -115,6 +112,37 @@ org.prezoserver.ConfigurationController = function($scope) {
 				this.csrfJS.passed = false;
 				this.csrfJS.message = " ... failed.";
 				$scope.$apply();
+			}.bind(this)
+		});
+	}.bind(this);
+	
+	/**
+	 * Tests that resources under prezo/support are not accessible from the client.
+	 */
+	this.testSupport = function() {
+		this.support.checked = true;
+		
+		$.ajax({
+			url: "prezo/support/test/test-resource.html",
+			dataType: "html",
+			statusCode: {
+				200: function() {
+					this.support.passed = false;
+					this.support.message = " ... failed.";
+					$scope.$apply();
+				}.bind(this),
+				404: function() {
+					this.support.passed = true;
+					this.support.message = " ... passed.";
+					$scope.$apply();
+				}.bind(this)
+			},
+			error: function(xhr) {
+				if (xhr.status !== 404) {
+					this.support.passed = false;
+					this.support.message = " ... failed.";
+					$scope.$apply();	
+				}
 			}.bind(this)
 		});
 	}.bind(this);

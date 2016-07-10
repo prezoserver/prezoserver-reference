@@ -2,16 +2,9 @@ Namespace("org.prezoserver");
 
 org.prezoserver.SecurityController = function($scope) {
 	this.TEST_IFRAME_ID = "test_iframe";
-	this.ajaxWithCsrf = {checked:false, passed:false, message:null};
-	this.ajaxNoCsrf = {checked:false, passed:false, message:null};
-	this.endpoint = null;
-	
-	this.reset = function() {
-		this.ajaxWithCsrf = {checked:false, passed:false, message:null};
-		this.ajaxNoCsrf = {checked:false, passed:false, message:null};
-	};
-	
-	this.reset = function() {
+	this.ENDPOINT = "api/test-csrf.html";
+		
+	this.init = function() {
 		this.ajaxWithCsrf = {checked:false, passed:false, message:null};
 		this.ajaxNoCsrf = {checked:false, passed:false, message:null};
 		$("#" + this.TEST_IFRAME_ID).remove();
@@ -20,7 +13,7 @@ org.prezoserver.SecurityController = function($scope) {
 	this.runTests = function() {	
 		setTimeout(this.testAjaxWithCsrf, 500);
 		setTimeout(this.createIframe, 750);
-		setTimeout(this.testAjaxNoCsrf, 1000);
+		setTimeout(this.testAjaxNoCsrf, 1250);
 		setTimeout(function() {
 			this.testsExecuted = true;
 			
@@ -29,7 +22,7 @@ org.prezoserver.SecurityController = function($scope) {
 			} else {
 				alert("Sorry! The server configuration does not appear to be PrezoServer compliant. Check configuration and try again.");
 			}
-		}.bind(this), 1250);
+		}.bind(this), 1500);
 	};
 	
 	/**
@@ -41,7 +34,7 @@ org.prezoserver.SecurityController = function($scope) {
 				
 		var timestamp = new Date().getTime();
 		$.ajax({
-			url: this.endpoint + "?t=" + timestamp,
+			url: this.ENDPOINT + "?t=" + timestamp,
 			dataType: "json",
 			statusCode: {
 				200: function(json) {
@@ -66,7 +59,7 @@ org.prezoserver.SecurityController = function($scope) {
 		
 		var body = $("#" + this.TEST_IFRAME_ID).contents().find("body").html();
 		
-		if (body.indexOf('AJAX status code 417 detected!') >= 0) {
+		if (body.indexOf('Potential CSRF Attack Detected') >= 0) {
 			this.ajaxNoCsrf.passed = true;
 			this.ajaxNoCsrf.message = " ... passed (request blocked and server returned status code 417).";
 		} else {
@@ -77,7 +70,7 @@ org.prezoserver.SecurityController = function($scope) {
 	}.bind(this);
 	
 	this.createIframe = function() {
-		$("body").append('<iframe id="' + this.TEST_IFRAME_ID + '" style="display:none" src="pages/security/iframe.html?endpoint='+ encodeURIComponent(this.endpoint) + '"></iframe>');
+		$("body").append('<iframe id="' + this.TEST_IFRAME_ID + '" style="display:none" src="pages/security/iframe.html?endpoint='+ encodeURIComponent(this.ENDPOINT) + '"></iframe>');
 	}.bind(this);
 };
 

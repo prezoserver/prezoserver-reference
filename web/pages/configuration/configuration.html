@@ -9,12 +9,12 @@
 	
 	<ul>
 		<li>SSI is verified by checking if HTML elements, included via SSI, are present on the page.</li>
-		<li>Availability of resources (base.html, prezo.js, and csrf.js) is verified by using an AJAX GET to successfully retrieve each resource.</li>
+		<li>Availability of resources (base.html, prezo.js, and csrf.js) are verified by using an AJAX GET to successfully retrieve each resource.</li>
 	</ul>
 	</blockquote>
 </div>
 
-<div class="col_6" ng-controller="ConfigurationController as config">
+<div class="col_6" ng-controller="ConfigurationController as config" ng-init="config.init()">
 	<h4>Tests</h4>
 	<blockquote>
 		<div class="notice" ng-class="{'warning':config.ssi.checked === false, 'success':config.ssi.checked && config.ssi.passed, 'error':config.ssi.checked && config.ssi.passed === false}">
@@ -37,7 +37,12 @@
 			<div>/prezo/js/csrf.js {{config.csrfJS.message}}</div>
 		</div>
 		
+		<div class="notice" ng-class="{'warning':config.support.checked === false, 'success':config.support.checked && config.support.passed, 'error':config.support.checked && config.support.passed === false}">
+			<i ng-class="{'icon-check':config.support.checked === true, 'icon-check-empty':config.support.checked === false}"></i>
+			<div>Access to /prezo/support {{config.support.message}}</div>
+		</div>
+		
 		<button class="medium green pill" ng-click="config.runTests()"><i class="icon-play-circle"></i> Run tests</button>
-		<button class="medium green pill" ng-click="config.reset()"><i class="icon-play-circle"></i> Reset</button>
+		<button class="medium green pill" ng-click="config.init()"><i class="icon-play-circle"></i> Reset</button>
 	</blockquote>
 </div>
